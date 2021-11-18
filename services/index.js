@@ -39,6 +39,42 @@ export const getPosts = async () => {
 
 };
 
+export const getPostDetails = async (link) => {
+    const query = gql`
+        query GetPostDetails($link: String!) {
+            post(where: { link: $link }) {
+                author {
+                    bio
+                    name
+                    id
+                    photo {
+                        url
+                    }
+                }
+                createdAt
+                link
+                title
+                excerpt
+                featuredImage {
+                    url
+                }
+                categories {
+                    name
+                    link
+                }
+                content {
+                    raw
+                }
+            }
+        }
+    `
+
+    const result = await request(graphqlApi, query, { link });
+
+    return result.post;
+
+};
+
 export const getRecentPosts = async () => {
     const query = gql`
         query GetPostDetails() {
@@ -62,7 +98,7 @@ export const getRecentPosts = async () => {
 
 };
 
-export const getSimilarPosts = async () => {
+export const getSimilarPosts = async (categories, link) => {
     const query = gql`
         query GetPostDetails($link: String!, $categories: [String!]) {
             posts(
@@ -79,7 +115,7 @@ export const getSimilarPosts = async () => {
         }
     `
 
-    const result = await request(graphqlApi, query);
+    const result = await request(graphqlApi, query, { categories, link });
 
     return result.posts;
 };
@@ -97,3 +133,15 @@ export const getCategories = async () => {
 
     return result.categories;
 };
+
+export const submitComment = async (obj) => {
+    const result = await fetch('/api/comments', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'aplication/json'
+        },
+        body: JSON.stringify(obj),
+    });
+
+    return result.json();
+}
