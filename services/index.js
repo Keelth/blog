@@ -134,6 +134,21 @@ export const getCategories = async () => {
     return result.categories;
 };
 
+export const getComments = async (link) => {
+    const query = gql`
+        query GetComments($link: String!) {
+            comments(where: { post: { link: $link } } ) {
+                name
+                createdAt
+                comment
+            }
+        }
+    `
+    const result = await request(graphqlApi, query, { link });
+
+    return result.comments;
+};
+
 export const submitComment = async (obj) => {
     const result = await fetch('/api/comments', {
         method: 'POST',
@@ -144,4 +159,29 @@ export const submitComment = async (obj) => {
     });
 
     return result.json();
-}
+};
+
+export const getFeaturedPosts = async () => {
+    const query = gql`
+      query GetCategoryPost() {
+        posts(where: {featuredPost: true}) {
+          author {
+            name
+            photo {
+              url
+            }
+          }
+          featuredImage {
+            url
+          }
+          title
+          link
+          createdAt
+        }
+      }   
+    `;
+  
+    const result = await request(graphqlApi, query);
+  
+    return result.posts;
+  };
